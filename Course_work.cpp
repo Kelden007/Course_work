@@ -71,14 +71,70 @@ enum keys
 	key1 = 49, key2, key3, key4, key5, key6
 };
 
-void matrix_input();
+void visual(int i, int j);
+void gauss1();
+void gauss(bool flag, bool inv_flag);
+void inv_gauss(bool flag, bool inv_flag, bool parameter);
+void matrix_rank(bool flag);
+void minor_s(int i, int j, int size);
+int determinant_count(int size);
+int element_write(int i, int j);
+void element_switch();
 void app_txt_matrix();
-void save_f(std::string result);
+void write_matrix();
+void app_txt_matrix();
+void write_matrix();
+void up_triangle();
 void matrix_analysis();
+void matrix_input();
+void app_txt_inverse_mat();
+void inverse_matrix();
+double input_num();
 int input_size();
+bool add_resolution(bool flag, char name[]);
+void save_f(std::string result);
+void app_txt_inp_fac_1(double a, double b, bool& flag);
+void input_factors_1(double& a, double& b, bool flag);
+void app_txt_cal_1(double x, double a, double b, bool flag);
+void calculation_1(double& x, double a, double b, bool flag);
+void equation_1();
+void app_txt_inp_fac_2(double a, double b, double c, bool& flag);
+void input_factors_2(double& a, double& b, double& c, bool flag);
+void app_txt_cal_dis(double D, double a, double b, double c, bool flag);
+void calculation_dis(double& D, double a, double b, double c, bool flag);
+void app_txt_cal_x_2(double x, double a, double b, double c, bool flag);
+void calculation_x_2(double& x, double a, double b, double c, bool flag);
+void app_txt_cal_x1_x2_2(double x, double x2, double a, double b, double D, bool flag);
+void calculation_x1_x2_2(double& x, double& x2, double a, double b, double D, bool flag);
+void app_txt_cal_x1i_x2i_2(double& x_real, double a, double b, double D, bool flag, double x1_i, double x2_i);
+void calculation_x1i_x2i_2(double& x_real, double a, double b, double D, bool flag, double& x1_i, double& x2_i);
+void equation_2();
+void app_txt_inp_fac_3(double a, double b, double c, double d, bool& flag);
+void input_factors_3(double& a, double& b, double& c, double& d, bool flag);
+void app_txt_cal_3(double a, double b, double c, double& d, bool& flag);
+void calculation_3(double& a, double& b, double& c, double& d, bool flag);
+void equation_3();
+void request_equation();
+void request_matrix();
+void output_text_menu_equation();
+void output_text_menu_matrix();
+void output_text_menu_main();
+void act_matrix_case_1();
+void act_matrix_case_2();
+void act_matrix_case_3();
+bool act_matrix_case_4();
 void menu_equations();
 void menu_matrix();
 void menu_main();
+
+int main()
+{
+	setlocale(LC_ALL, "ru");
+	std::ios::sync_with_stdio(false);
+	std::cin.tie(0);
+	menu_main();
+	return 0;
+}
 
 void visual(int i, int j)
 {
@@ -1916,29 +1972,6 @@ void request_matrix()
 	} while (flag);
 }
 
-void output_text_menu_main()
-{
-	int i = 1;
-	for (std::string text_menu : act_main_menu)
-	{
-		SetConsoleTextAttribute(color, 1);
-		std::string marker;
-		if (key == i)
-		{
-			SetConsoleTextAttribute(color, 9);
-			marker = " <--";
-		}
-		else
-		{
-			marker = "  ";
-			SetConsoleTextAttribute(color, 1);
-		}
-		std::string menuline = text_menu + marker;
-		std::cout << menuline << std::endl;
-		++i;
-	}
-}
-
 void output_text_menu_equation()
 {
 	int i = 1;
@@ -1966,6 +1999,29 @@ void output_text_menu_matrix()
 {
 	int i = 1;
 	for (std::string text_menu : act_menu_matrix)
+	{
+		SetConsoleTextAttribute(color, 1);
+		std::string marker;
+		if (key == i)
+		{
+			SetConsoleTextAttribute(color, 9);
+			marker = " <--";
+		}
+		else
+		{
+			marker = "  ";
+			SetConsoleTextAttribute(color, 1);
+		}
+		std::string menuline = text_menu + marker;
+		std::cout << menuline << std::endl;
+		++i;
+	}
+}
+
+void output_text_menu_main()
+{
+	int i = 1;
+	for (std::string text_menu : act_main_menu)
 	{
 		SetConsoleTextAttribute(color, 1);
 		std::string marker;
@@ -2235,13 +2291,4 @@ void menu_main()
 			}
 		}
 	} while (true);
-}
-
-int main()
-{
-	setlocale(LC_ALL, "ru");
-	std::ios::sync_with_stdio(false);
-	std::cin.tie(0);
-	menu_main();
-	return 0;
 }
