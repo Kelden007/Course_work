@@ -353,6 +353,7 @@ int element_write(int i, int j)
 		if (numb == ESC)
 		{
 			matrix_analysis();
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			menu_matrix();
 		}
 		if (numb == 114)
@@ -685,6 +686,7 @@ double input_num()
 		switch (button)
 		{
 		case ESC:
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			menu_equations();
 			break;
 		case BACKSPACE:
@@ -792,6 +794,7 @@ int input_size()
 		switch (fix)
 		{
 		case ESC:
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			menu_matrix();
 			break;
 		case BACKSPACE:
@@ -1931,6 +1934,7 @@ void request_equation()
 		{
 		case 27:
 			mark = false, flag = false;
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case 83:
 			mark = false;
@@ -1961,6 +1965,7 @@ void request_matrix()
 		{
 		case 27:
 			mark = false, flag = false;
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case 83:
 			mark = false;
@@ -2101,7 +2106,7 @@ bool act_matrix_case_4()
 void menu_equations()
 {
 	int num_but;
-	key = 1;
+	//key = 1;
 	do
 	{
 		if (mark == false)
@@ -2140,6 +2145,7 @@ void menu_equations()
 			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case ESC:
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			menu_main();
 			break;
 		case ENTER:
@@ -2177,7 +2183,7 @@ void menu_equations()
 void menu_matrix()
 {
 	int num_but;
-	key = 1;
+	//key = 1;
 	do
 	{
 		system("cls");
@@ -2215,6 +2221,7 @@ void menu_matrix()
 			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case ESC:
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
 			menu_main();
 			break;
 		case ENTER:
@@ -2241,7 +2248,8 @@ void menu_matrix()
 void menu_main()
 {
 	int num_but;
-	key = 1;
+	if (key > 2)
+		key = 2;;
 	do
 	{
 		system("cls");
