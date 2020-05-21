@@ -16,13 +16,10 @@ const int l = 10;
 float matrix[l][l * 2];
 int minor[l][l + 1][l];
 float inv_matrix[l][l];
-int _rank1 = 0, _rank2 = 0;
-int determinant = 0;
-int k = 0;
-int action = 1;
+int _rank1 = 0, _rank2 = 0, determinant = 0;
+int k = 0, action = 1;
 int size_x = 0, size_y = 0;
-int menusize;
-int base = 10;
+int menusize, base = 10;
 int b_old = 0, c_old = 0, d_old = 0;
 
 constexpr auto MENUWIDE = 40;
@@ -48,7 +45,8 @@ std::string str = "";
 std::string act_main_menu[] =
 {
 "1. Алгебраическое уравнение",
-"2. Матрицы"
+"2. Матрицы",
+"3. Загрузка из файла"
 };
 
 std::string act_menu_equation[] =
@@ -93,6 +91,7 @@ double input_num();
 int input_size();
 bool add_resolution(bool flag, char name[]);
 void save_f(std::string result);
+void load_f();
 void app_txt_inp_fac_1(double a, double b, bool& flag);
 void input_factors_1(double& a, double& b, bool flag);
 void app_txt_cal_1(double x, double a, double b, bool flag);
@@ -375,11 +374,21 @@ int element_write(int i, int j)
 		{
 			save_flag_inp = true;
 			app_txt_matrix();
+			str.append("\r");
 			save_f(str);
 			save_flag_inp = false;
 			system("cls");
 			SetConsoleTextAttribute(color, 3);
 			matrix_input();
+		}
+		if (numb == 8)
+		{
+			if (m > 0)
+			{
+				value[m - 1] = '\0';
+				--m;
+				std::cout << '\b' << " " << '\b';
+			}
 		}
 		if (numb != 224 && (numb < 48 || numb > 57))
 		{
@@ -647,11 +656,12 @@ void app_txt_inverse_mat()
 		}
 		str.append("|\n");
 	}
+	str.append("\r");
 }
 
 void inverse_matrix()
 {
-	visual(0, menusize + 5);
+	visual(0, size_y + 4);
 	std::cout << "\nОбратная матррица: \n";
 	for (int i = 0; i < size_y; ++i)
 	{
@@ -871,7 +881,7 @@ void save_f(std::string result)
 	std::cout << "Введите имя файла или путь куда сохранится файл (пример пути \"C:\\Example\\save\").";
 	std::cout << "\nВ этом примере C - имя диска, Example - имя папки, save - имя файла.";
 	std::cout << "\nМежду наименованиями дисков или файлов ставится \'\\\' или \'/\'. После диска ставится \':\'\n";
-	std::cout << "Также можно ввести просто имя файла. Оно сохранится в ту папку, где находится программа.\n\n";
+	std::cout << "Также можно ввести просто имя файла. Оно сохранится в ту папку, где находится проект.\n\n";
 	bool flag = false;
 	int count;
 	char name[100] = "";
@@ -908,6 +918,69 @@ void save_f(std::string result)
 	}
 	else
 		std::cout << "\nСохранение было успешно произведено!\nНажмите ESC, чтобы вернуться в меню\n";
+}
+
+void load_f()
+{
+	SetConsoleTextAttribute(color, 7);
+	std::cout << "Введите имя файла или путь откуда будет загружаться файл (пример пути \"C:\\Example\\save\").";
+	std::cout << "\nВ этом примере C - имя диска, Example - имя папки, save - имя файла.";
+	std::cout << "\nМежду наименованиями дисков или файлов ставится \'\\\' или \'/\'. После диска ставится \':\'\n";
+	std::cout << "Также можно ввести просто имя файла. Оно загрузит из той папки, где находится проект.\n\n";
+	bool flag = false, mark = false;
+	char name[100] = "", space, element, cont;
+	FILE* f;
+	while (true)
+	{
+		std::cin.ignore(std::cin.rdbuf()->in_avail());
+		add_resolution(flag, name);
+		std::cout << std::endl;
+		fopen_s(&f, name, "r+t");
+		if (f == NULL)
+		{
+			SetConsoleTextAttribute(color, 4);
+			PlaySound(TEXT("error"), NULL, SND_ASYNC | SND_FILENAME);
+			Sleep(100);
+			std::cout << "Ошибка. Введено некорректное имя файла или путь. Попробуйте ещё раз:\n\n";
+		}
+		else
+			break;
+	}
+	space = 't';
+	fseek(f, -4, SEEK_CUR), fread(&cont, 1, 1, f), fseek(f, -1, SEEK_CUR);
+	while (true)
+	{
+		if (mark == 1)
+		{
+			fread(&cont, 1, 1, f);
+			fseek(f, -1, SEEK_CUR);
+		}
+		switch (cont)
+		{
+		case 10:
+		{
+			fread(&cont, 1, 1, f);
+			std::cout << cont;
+			space = cont;
+			break;
+		}
+		case '\r':
+		{
+			fclose(f);
+			SetConsoleTextAttribute(color, 4);
+			std::cout << "\nЗагрузка была успешна произведена!\n";
+			return;
+		}
+		default:
+		{
+			fread(&element, sizeof(char), 1, f);
+			std::cout << element;
+			mark = 1;
+			space = cont;
+			break;
+		}
+		}
+	}
 }
 
 void app_txt_inp_fac_1(double a, double b, bool& flag)
@@ -971,12 +1044,12 @@ void app_txt_cal_1(double x, double a, double b, bool flag)
 				str += "\n", str += std::to_string(int(a)), str.append("*x = "), str += std::to_string(int(b));
 				str += "\n", str.append("x = "), str += std::to_string(int(b)), str.append(" / "), str += std::to_string(int(a)), str.append(" = "), str += std::to_string(int(x)), str += "\n";
 			}
-			str.append("\nОтвет: x = "), str += std::to_string(int(x)), str.append(".\n");
+			str.append("\nОтвет: x = "), str += std::to_string(int(x)), str.append(".\n\r");
 		}
 		else if (a == 0 && b != 0)
-			str.append("\nОтвет: уравнение не имеет корней.\n");
+			str.append("\nОтвет: уравнение не имеет корней.\n\r");
 		else
-			str.append("\nОтвет: x может принимать любое вещественное значение.\n");
+			str.append("\nОтвет: x может принимать любое вещественное значение.\n\r");
 	}
 	else
 	{
@@ -1243,7 +1316,7 @@ void app_txt_cal_x_2(double x, double a, double b, double c, bool flag)
 		}
 		else
 			str.append("\nx = 0\n");
-		str.append("Ответ: x = "), str += std::to_string(int(x)), str.append(".\n");
+		str.append("Ответ: x = "), str += std::to_string(int(x)), str.append(".\n\r");
 	}
 	else
 	{
@@ -1271,7 +1344,7 @@ void app_txt_cal_x_2(double x, double a, double b, double c, bool flag)
 		}
 		else
 			str.append("\nx = 0\n");
-		str.append("Ответ: x = "), str += std::to_string(x), str.append(".\n");
+		str.append("Ответ: x = "), str += std::to_string(x), str.append(".\n\r");
 	}
 }
 
@@ -1340,7 +1413,7 @@ void app_txt_cal_x1_x2_2(double x, double x2, double a, double b, double D, bool
 			str.append("\nx2 = (-("), str += std::to_string(int(b)), str.append(") + "), str += std::to_string(int(D)), str.append("^0.5) / (2*("), str += std::to_string(int(a)), str.append("))");
 			str.append(" = "), str += std::to_string(int(-b + sqrt(D))), str.append(" / ("), str += std::to_string(int(2 * a)), str.append(") = "), str += std::to_string(int(x2)), str.append(";\n");
 		}
-		str.append("\nОтвет: x1 = "), str += std::to_string(int(x)), str.append("; x2 = "), str += std::to_string(int(x2)), str.append(".\n");
+		str.append("\nОтвет: x1 = "), str += std::to_string(int(x)), str.append("; x2 = "), str += std::to_string(int(x2)), str.append(".\n\r");
 	}
 	else
 	{
@@ -1373,7 +1446,7 @@ void app_txt_cal_x1_x2_2(double x, double x2, double a, double b, double D, bool
 			str.append("\nx2 = (-("), str += std::to_string(b), str.append(") + "), str += std::to_string(D), str.append("^0.5) / (2*("), str += std::to_string(a), str.append("))");
 			str.append(" = "), str += std::to_string(-b + sqrt(D)), str.append(" / ("), str += std::to_string(2 * a), str.append(") = "), str += std::to_string(x2), str.append(";\n");
 		}
-		str.append("\nОтвет: x1 = "), str += std::to_string(x), str.append("; x2 = "), str += std::to_string(x2), str.append(".\n");
+		str.append("\nОтвет: x1 = "), str += std::to_string(x), str.append("; x2 = "), str += std::to_string(x2), str.append(".\n\r");
 	}
 }
 
@@ -1449,7 +1522,7 @@ void app_txt_cal_x1i_x2i_2(double& x_real, double a, double b, double D, bool fl
 			str.append("\nx2_i = (-("), str += std::to_string(int(b)), str.append(") - ("), str += std::to_string(int(abs((D)))), str.append("*i^2)^0.5) / (2*("), str += std::to_string(int(a)), str.append("))");
 			str.append(" = "), str += std::to_string(int(x_real)), str.append(" - "), str += std::to_string(int(abs(x2_i))), str.append("*i.");
 		}
-		str.append("\nОтвет: x1_i = "), str += std::to_string(int(x_real)), str.append(" + "), str += std::to_string(int(x1_i)), str.append("*i; x2_i = ");
+		str.append("\nОтвет: x1_i = "), str += std::to_string(int(x_real)), str.append(" + "), str += std::to_string(int(x1_i)), str.append("*i; x2_i = "), str += std::to_string(x2_i), str.append("*i.\n\r");
 	}
 	else
 	{
@@ -1485,7 +1558,7 @@ void app_txt_cal_x1i_x2i_2(double& x_real, double a, double b, double D, bool fl
 			str.append("\nx2_i = (-("), str += std::to_string(b), str.append(") - ("), str += std::to_string(abs((D))), str.append("*i^2)^0.5) / (2*("), str += std::to_string(a), str.append("))");
 			str.append(" = "), str += std::to_string(x_real), str.append(" - "), str += std::to_string(abs(x2_i)), str.append("*i.");
 		}
-		str.append("\nОтвет: x1_i = "), str += std::to_string(x_real), str.append(" + "), str += std::to_string(x1_i), str.append("*i; x2_i = "), str += std::to_string(x2_i), str.append("*i.\n");
+		str.append("\nОтвет: x1_i = "), str += std::to_string(x_real), str.append(" + "), str += std::to_string(x1_i), str.append("*i; x2_i = "), str += std::to_string(x2_i), str.append("*i.\n\r");
 	}
 }
 
@@ -1725,12 +1798,12 @@ void app_txt_cal_3(double a, double b, double c, double& d, bool& flag)
 		if (x2_imag != 0 && x3_imag != 0)
 		{
 			str.append("\nОтвет: x1 = "), str += std::to_string(int(x1_real)), str.append("; x2 = "), str += std::to_string(int(x2_real)), str.append(" + "), str += std::to_string(int(x2_imag));
-			str.append("*i; x3 = "), str += std::to_string(int(x3_real)), str.append(" + "), str += std::to_string(int(x3_imag)), str.append("*i.\n");
+			str.append("*i; x3 = "), str += std::to_string(int(x3_real)), str.append(" + "), str += std::to_string(int(x3_imag)), str.append("*i.\n\r");
 		}
 		else
 		{
 			str.append("\nОтвет: x1 = "), str += std::to_string(int(x1_real)), str.append("; x2 = "), str += std::to_string(int(x2_real));
-			str.append("; x3 = "), str += std::to_string(int(x3_real)), str.append(".\n");
+			str.append("; x3 = "), str += std::to_string(int(x3_real)), str.append(".\n\r");
 		}
 	}
 	else
@@ -1807,12 +1880,12 @@ void app_txt_cal_3(double a, double b, double c, double& d, bool& flag)
 		if (x2_imag != 0 && x3_imag != 0)
 		{
 			str.append("\nОтвет: x1 = "), str += std::to_string(x1_real), str.append("; x2 = "), str += std::to_string(x2_real), str.append(" + "), str += std::to_string(x2_imag);
-			str.append("*i; x3 = "), str += std::to_string(x3_real), str.append(" + "), str += std::to_string(x3_imag), str.append("*i.\n");
+			str.append("*i; x3 = "), str += std::to_string(x3_real), str.append(" + "), str += std::to_string(x3_imag), str.append("*i.\n\r");
 		}
 		else
 		{
 			str.append("\nОтвет: x1 = "), str += std::to_string(x1_real), str.append("; x2 = "), str += std::to_string(x2_real);
-			str.append("; x3 = "), str += std::to_string(x3_real), str.append(".\n");
+			str.append("; x3 = "), str += std::to_string(x3_real), str.append(".\n\r");
 		}
 	}
 }
@@ -1977,6 +2050,26 @@ void request_matrix()
 	} while (flag);
 }
 
+void request_load()
+{
+	bool flag = true;
+	SetConsoleTextAttribute(color, 4);
+	std::cout << "\nДля выхода нажмите ESC\n";
+	do
+	{
+		int num_but = _getch();
+		switch (num_but)
+		{
+		case 27:
+			mark = false, flag = false;
+			PlaySound(TEXT("beep_exit"), NULL, SND_ASYNC | SND_FILENAME);
+			break;
+		default:
+			break;
+		}
+	} while (flag);
+}
+
 void output_text_menu_equation()
 {
 	int i = 1;
@@ -2063,7 +2156,7 @@ void act_matrix_case_2()
 	write_matrix();
 	app_txt_matrix();
 	std::cout << "\nРанг: " << _rank1 << std::endl;
-	str.append("\nРанг: "), str += std::to_string(int(_rank1)), str += "\n";
+	str.append("\nРанг: "), str += std::to_string(int(_rank1)), str += "\n\r";
 	request_matrix();
 	str.clear();
 }
@@ -2077,7 +2170,7 @@ void act_matrix_case_3()
 	write_matrix();
 	app_txt_matrix();
 	std::cout << "\nДетерминант: " << determinant << std::endl;
-	str.append("\nДетерминант: "), str += std::to_string(int(determinant)), str += "\n";
+	str.append("\nДетерминант: "), str += std::to_string(int(determinant)), str += "\n\r";
 	request_matrix();
 	str.clear();
 }
@@ -2092,7 +2185,7 @@ bool act_matrix_case_4()
 	app_txt_matrix();
 	if (determinant == 0)
 	{
-		std::cout << "\nОбратная матрица не найдена\n", str.append("\nОбратная матрица не найдена\n");
+		std::cout << "\nОбратная матрица не найдена\n", str.append("\nОбратная матрица не найдена\n\r");
 		request_matrix();
 		return true;
 	}
@@ -2183,7 +2276,6 @@ void menu_equations()
 void menu_matrix()
 {
 	int num_but;
-	//key = 1;
 	do
 	{
 		system("cls");
@@ -2248,8 +2340,8 @@ void menu_matrix()
 void menu_main()
 {
 	int num_but;
-	if (key > 2)
-		key = 2;;
+	if (key > 3)
+		key = 3;;
 	do
 	{
 		system("cls");
@@ -2261,13 +2353,13 @@ void menu_main()
 		switch (num_but)
 		{
 		case DOWN:
-			if (++key == 3)
+			if (++key == 4)
 				key = 1;
 			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case UP:
 			if (--key == 0)
-				key = 2;
+				key = 3;
 			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case ONE:
@@ -2276,6 +2368,10 @@ void menu_main()
 			break;
 		case TWO:
 			key = 2;
+			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
+			break;
+		case THREE:
+			key = 3;
 			PlaySound(TEXT("switch_menu"), NULL, SND_ASYNC | SND_FILENAME);
 			break;
 		case ESC:
@@ -2294,7 +2390,15 @@ void menu_main()
 				system("cls");
 				PlaySound(TEXT("beep_choose"), NULL, SND_ASYNC | SND_FILENAME);
 				Sleep(100);
+				key = 1;
 				menu_matrix();
+				break;
+			case 3:
+				system("cls");
+				PlaySound(TEXT("beep_choose"), NULL, SND_ASYNC | SND_FILENAME);
+				Sleep(100);
+				load_f();
+				request_load();
 				break;
 			}
 		}
