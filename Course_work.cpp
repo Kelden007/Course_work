@@ -2199,7 +2199,6 @@ bool act_matrix_case_4()
 void menu_equations()
 {
 	int num_but;
-	//key = 1;
 	do
 	{
 		if (mark == false)
