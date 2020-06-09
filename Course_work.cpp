@@ -2,12 +2,11 @@
 #include <cmath>
 #include <conio.h>
 #include <string>
-#include <windows.h>
 #include <stdio.h>
 #include <cmath>
-#pragma comment(lib, "winmm.lib")
+#include <windows.h>
 
-const HANDLE color = GetStdHandle(STD_OUTPUT_HANDLE);
+#pragma comment(lib, "winmm.lib")
 
 short key = 1, pointer;
 bool mark = false, reverse = true, save_flag_inp = false;
@@ -39,6 +38,32 @@ constexpr auto LIMIT = 308;
 
 const double M_PI = 3.1415926535897932384626433832795;
 const double M_2PI(2. * M_PI);
+
+enum ConsoleColor
+{
+	Black = 0,
+	Blue = 1,
+	Green = 2,
+	Cyan = 3,
+	Red = 4,
+	Magenta = 5,
+	Brown = 6,
+	LightGray = 7,
+	DarkGray = 8,
+	LightBlue = 9,
+	LightGreen = 10,
+	LightCyan = 11,
+	LightRed = 12,
+	LightMagenta = 13,
+	Yellow = 14,
+	White = 15
+} Color;
+
+void SetColor(ConsoleColor text, ConsoleColor background)
+{
+	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hStdOut, (WORD)((background << 4) | text));
+}
 
 std::string str = "";
 
@@ -339,9 +364,9 @@ int element_write(int i, int j)
 		visual(16, size_y + menusize + 4);
 	}
 	std::cout << std::endl;
-	SetConsoleTextAttribute(color, 4);
+	SetColor(Red, Black);
 	std::cout << "\nДля выхода нажмите ESC\n" << "Для сохранения решения нажмите S\n" << "Для того чтобы ввести заново коэффициенты, нажмите R\n";
-	SetConsoleTextAttribute(color, 3);
+	SetColor(Cyan, Black);
 	visual(16, size_y + menusize + 4);
 	int numb, m;
 	for (m = 0; m < ELEMENT_LEN; ++m)
@@ -378,7 +403,7 @@ int element_write(int i, int j)
 			save_f(str);
 			save_flag_inp = false;
 			system("cls");
-			SetConsoleTextAttribute(color, 3);
+			SetColor(Cyan, Black);
 			matrix_input();
 		}
 		if (numb == 8)
@@ -856,9 +881,9 @@ bool add_resolution(bool flag, char name[])
 	int i = 0, counter = 0;
 	while (flag == false)
 	{
-		SetConsoleTextAttribute(color, 6);
+		SetColor(Brown, Black);
 		std::cout << "Имя файла или путь: ";
-		SetConsoleTextAttribute(color, 14);
+		SetColor(Yellow, Black);
 		std::cin.getline(name, 100);
 		for (int j = 0; j < 96; j++)
 		{
@@ -877,7 +902,7 @@ bool add_resolution(bool flag, char name[])
 void save_f(std::string result)
 {
 	system("cls");
-	SetConsoleTextAttribute(color, 7);
+	SetColor(LightGray, Black);
 	std::cout << "Введите имя файла или путь куда сохранится файл (пример пути \"C:\\Example\\save\").";
 	std::cout << "\nВ этом примере C - имя диска, Example - имя папки, save - имя файла.";
 	std::cout << "\nМежду наименованиями дисков или файлов ставится \'\\\' или \'/\'. После диска ставится \':\'\n";
@@ -893,7 +918,7 @@ void save_f(std::string result)
 		fopen_s(&f, name, "w+t");
 		if (f == NULL)
 		{
-			SetConsoleTextAttribute(color, 4);
+			SetColor(Red, Black);
 			PlaySound(TEXT("error"), NULL, SND_ASYNC | SND_FILENAME);
 			Sleep(100);
 			std::cout << "Ошибка. Введено некорректное имя файла или путь. Попробуйте ещё раз:\n\n";
@@ -903,7 +928,7 @@ void save_f(std::string result)
 	}
 	count = fwrite(result.c_str(), sizeof(char), result.size(), f);
 	fclose(f);
-	SetConsoleTextAttribute(color, 4);
+	SetColor(Red, Black);
 	printf("\a");
 	if (save_flag_inp)
 	{
@@ -922,7 +947,7 @@ void save_f(std::string result)
 
 void load_f()
 {
-	SetConsoleTextAttribute(color, 7);
+	SetColor(LightGray, Black);
 	std::cout << "Введите имя файла или путь откуда будет загружаться файл (пример пути \"C:\\Example\\save\").";
 	std::cout << "\nВ этом примере C - имя диска, Example - имя папки, save - имя файла.";
 	std::cout << "\nМежду наименованиями дисков или файлов ставится \'\\\' или \'/\'. После диска ставится \':\'\n";
@@ -938,7 +963,7 @@ void load_f()
 		fopen_s(&f, name, "r+t");
 		if (f == NULL)
 		{
-			SetConsoleTextAttribute(color, 4);
+			SetColor(Red, Black);
 			PlaySound(TEXT("error"), NULL, SND_ASYNC | SND_FILENAME);
 			Sleep(100);
 			std::cout << "Ошибка. Введено некорректное имя файла или путь. Попробуйте ещё раз:\n\n";
@@ -967,7 +992,7 @@ void load_f()
 		case '\r':
 		{
 			fclose(f);
-			SetConsoleTextAttribute(color, 4);
+			SetColor(Red, Black);
 			std::cout << "\nЗагрузка была успешна произведена!\n";
 			return;
 		}
@@ -1020,7 +1045,7 @@ void input_factors_1(double& a, double& b, bool flag)
 	a = input_num();
 	std::cout << "\nВведите коэффициент \'b\': ";
 	b = input_num();
-	SetConsoleTextAttribute(color, 3);
+	SetColor(Cyan, Black);
 	std::cout << "\n\n" << a << "*x ";
 	if (b >= 0)
 		std::cout << "+ " << b << " = 0\n";
@@ -1102,7 +1127,7 @@ void equation_1()
 {
 	bool flag = false;
 	double a, b, x;
-	SetConsoleTextAttribute(color, 11);
+	SetColor(LightCyan, Black);
 	input_factors_1(a, b, flag);
 	app_txt_inp_fac_1(a, b, flag);
 	calculation_1(x, a, b, flag);
@@ -1158,7 +1183,7 @@ void input_factors_2(double& a, double& b, double& c, bool flag)
 	b = input_num();
 	std::cout << "\nВведите коэффициент \'c\': ";
 	c = input_num();
-	SetConsoleTextAttribute(color, 3);
+	SetColor(Cyan, Black);
 	std::cout << "\n\n" << a << "*x^2 ";
 	if (b >= 0)
 		std::cout << "+ " << b << "*x ";
@@ -1605,7 +1630,7 @@ void equation_2()
 {
 	bool flag = false;
 	double D, x = 0, x2 = 0, a = 0, b = 0, c = 0, x1_i = 0, x2_i = 0;
-	SetConsoleTextAttribute(color, 11);
+	SetColor(LightCyan, Black);
 	input_factors_2(a, b, c, flag);
 	app_txt_inp_fac_2(a, b, c, flag);
 	if (a != 0)
@@ -1694,7 +1719,7 @@ void input_factors_3(double& a, double& b, double& c, double& d, bool flag)
 	c = input_num();
 	std::cout << "\nВведите коэффициент \'d\': ";
 	d = input_num();
-	SetConsoleTextAttribute(color, 3);
+	SetColor(Cyan, Black);
 	std::cout << "\n\n" << a << "*x^3 ";
 	if (b >= 0)
 		std::cout << "+ " << b << "*x^2 ";
@@ -1983,7 +2008,7 @@ void equation_3()
 {
 	bool flag = false;
 	double a, b, c, d, p, q, s, f, x1, x2, x3, x2i, x3i;
-	SetConsoleTextAttribute(color, 11);
+	SetColor(LightCyan, Black);
 	input_factors_3(a, b, c, d, flag);
 	app_txt_inp_fac_3(a, b, c, d, flag);
 	calculation_3(a, b, c, d, flag);
@@ -1994,7 +2019,7 @@ void equation_3()
 void request_equation()
 {
 	bool flag = true;
-	SetConsoleTextAttribute(color, 4);
+	SetColor(Red, Black);
 	std::cout << "\nДля выхода нажмите ESC\n" << "Для сохранения решения нажмите S\n" << "Для того чтобы ввести заново коэффициенты, нажмите R\n";
 	do
 	{
@@ -2027,7 +2052,7 @@ void request_equation()
 void request_matrix()
 {
 	bool flag = true;
-	SetConsoleTextAttribute(color, 4);
+	SetColor(Red, Black);
 	std::cout << "\nДля выхода нажмите ESC\n" << "Для сохранения решения нажмите S\n";
 	do
 	{
@@ -2053,7 +2078,7 @@ void request_matrix()
 void request_load()
 {
 	bool flag = true;
-	SetConsoleTextAttribute(color, 4);
+	SetColor(Red, Black);
 	std::cout << "\nДля выхода нажмите ESC\n";
 	do
 	{
@@ -2075,17 +2100,17 @@ void output_text_menu_equation()
 	int i = 1;
 	for (std::string text_menu : act_menu_equation)
 	{
-		SetConsoleTextAttribute(color, 1);
+		SetColor(Blue, Black);
 		std::string marker;
 		if (key == i)
 		{
-			SetConsoleTextAttribute(color, 9);
+			SetColor(LightBlue, Black);
 			marker = " <--";
 		}
 		else
 		{
 			marker = "  ";
-			SetConsoleTextAttribute(color, 1);
+			SetColor(Blue, Black);
 		}
 		std::string menuline = text_menu + marker;
 		std::cout << menuline << std::endl;
@@ -2098,17 +2123,17 @@ void output_text_menu_matrix()
 	int i = 1;
 	for (std::string text_menu : act_menu_matrix)
 	{
-		SetConsoleTextAttribute(color, 1);
+		SetColor(Blue, Black);
 		std::string marker;
 		if (key == i)
 		{
-			SetConsoleTextAttribute(color, 9);
+			SetColor(LightBlue, Black);
 			marker = " <--";
 		}
 		else
 		{
 			marker = "  ";
-			SetConsoleTextAttribute(color, 1);
+			SetColor(Blue, Black);
 		}
 		std::string menuline = text_menu + marker;
 		std::cout << menuline << std::endl;
@@ -2121,17 +2146,17 @@ void output_text_menu_main()
 	int i = 1;
 	for (std::string text_menu : act_main_menu)
 	{
-		SetConsoleTextAttribute(color, 1);
+		SetColor(Blue, Black);
 		std::string marker;
 		if (key == i)
 		{
-			SetConsoleTextAttribute(color, 9);
+			SetColor(LightBlue, Black);
 			marker = " <--";
 		}
 		else
 		{
 			marker = "  ";
-			SetConsoleTextAttribute(color, 1);
+			SetColor(Blue, Black);
 		}
 		std::string menuline = text_menu + marker;
 		std::cout << menuline << std::endl;
@@ -2205,7 +2230,7 @@ void menu_equations()
 		{
 			system("cls");
 			output_text_menu_equation();
-			SetConsoleTextAttribute(color, 3);
+			SetColor(Cyan, Black);
 			num_but = _getch();
 			if (num_but == 224)
 				num_but = _getch();
@@ -2279,7 +2304,7 @@ void menu_matrix()
 	{
 		system("cls");
 		output_text_menu_matrix();
-		SetConsoleTextAttribute(color, 3);
+		SetColor(Cyan, Black);
 		num_but = _getch();
 		if (num_but == 224)
 			num_but = _getch();
@@ -2345,7 +2370,7 @@ void menu_main()
 	{
 		system("cls");
 		output_text_menu_main();
-		SetConsoleTextAttribute(color, 3);
+		SetColor(Cyan, Black);
 		num_but = _getch();
 		if (num_but == 224)
 			num_but = _getch();
